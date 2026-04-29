@@ -3,13 +3,77 @@
 <head>
   <meta charset="utf-8">
   <title>Danielle's Pages</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 16px;
+      line-height: 1.5;
+    }
+    h1 {
+      margin-bottom: 8px;
+    }
+    p {
+      color: #666;
+      margin-bottom: 24px;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    li {
+      margin: 10px 0;
+    }
+    a {
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
   <h1>Danielle's Share Pages</h1>
-  <ul>
-    <li><a href="mvp-mapping.html">MVP Needs vs Jira Map</a></li>
-    <li><a href="ledger-recon.html">Ledger Recon Notes</a></li>
-    <li><a href="brain-dump-1.html">Brain Dump 1</a></li>
+  <p>Pages currently in this repo:</p>
+  <ul id="page-list">
+    <li>Loading…</li>
   </ul>
+
+  <script>
+    const owner = "ddiedrick-max";
+    const repo = "share-html";
+    const branch = "main";
+
+    async function loadPages() {
+      const list = document.getElementById("page-list");
+
+      try {
+        const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/?ref=${branch}`);
+        const files = await res.json();
+
+        const htmlFiles = files
+          .filter(file =>
+            file.type === "file" &&
+            file.name.endsWith(".html") &&
+            file.name !== "index.html"
+          )
+          .sort((a, b) => a.name.localeCompare(b.name));
+
+        if (!htmlFiles.length) {
+          list.innerHTML = "<li>No additional HTML pages found.</li>";
+          return;
+        }
+
+        list.innerHTML = htmlFiles
+          .map(file => `<li><a href="${file.name}">${file.name}</a></li>`)
+          .join("");
+      } catch (err) {
+        list.innerHTML = "<li>Could not load pages.</li>";
+        console.error(err);
+      }
+    }
+
+    loadPages();
+  </script>
 </body>
 </html>
