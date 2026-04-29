@@ -1,0 +1,351 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.wrap { padding: 1rem 0; font-family: var(--font-sans, system-ui, sans-serif); }
+.intro { font-size: 12px; color: var(--color-text-secondary, #666); margin-bottom: 1rem; line-height: 1.6; max-width: 920px; }
+.intro strong { color: var(--color-text-primary, #111); }
+.filters { display: flex; gap: 8px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+.filter-btn { font-size: 12px; padding: 4px 12px; border-radius: 8px; border: 0.5px solid var(--color-border-secondary, #ccc); background: transparent; color: var(--color-text-secondary, #666); cursor: pointer; font-family: inherit; }
+.filter-btn.active { background: var(--color-background-secondary, #f5f5f5); color: var(--color-text-primary, #111); border-color: var(--color-border-primary, #999); }
+.summary { display: flex; gap: 12px; margin-bottom: 1rem; flex-wrap: wrap; }
+.stat { background: var(--color-background-secondary, #f5f5f5); border-radius: 8px; padding: 8px 14px; font-size: 12px; color: var(--color-text-secondary, #666); }
+.stat strong { display: block; font-size: 20px; font-weight: 500; color: var(--color-text-primary, #111); }
+.stat span { display: block; font-size: 11px; color: var(--color-text-secondary, #888); }
+.legend { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 1.25rem; }
+.leg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--color-text-secondary, #666); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+thead th { text-align: left; font-weight: 500; font-size: 12px; color: var(--color-text-secondary, #666); padding: 6px 8px; border-bottom: 0.5px solid var(--color-border-tertiary, #e0e0e0); background: var(--color-background-secondary, #f5f5f5); }
+thead th:nth-child(1) { width: 5%; }
+thead th:nth-child(2) { width: 22%; }
+thead th:nth-child(3) { width: 26%; }
+thead th:nth-child(4) { width: 9%; }
+thead th:nth-child(5) { width: 11%; }
+thead th:nth-child(6) { width: 9%; }
+thead th:nth-child(7) { width: 18%; }
+tr.phase-hdr td { padding: 6px 8px; font-size: 11px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--color-text-secondary, #666); background: var(--color-background-tertiary, #efefef); border-top: 0.5px solid var(--color-border-secondary, #ccc); border-bottom: 0.5px solid var(--color-border-secondary, #ccc); }
+tr.row { border-bottom: 0.5px solid var(--color-border-tertiary, #e0e0e0); vertical-align: top; }
+tr.row:hover { background: var(--color-background-secondary, #f9f9f9); }
+td { padding: 7px 8px; color: var(--color-text-primary, #111); line-height: 1.5; }
+.num { font-weight: 500; color: var(--color-text-secondary, #666); font-size: 12px; }
+.need-text { font-size: 12px; line-height: 1.6; margin-bottom: 4px; }
+.tickets { display: flex; flex-direction: column; gap: 5px; }
+.ticket-key { font-size: 11px; font-weight: 500; color: var(--color-text-info, #0066cc); font-family: var(--font-mono, monospace); text-decoration: none; }
+.ticket-key:hover { text-decoration: underline; }
+.ticket-summ { font-size: 11px; color: var(--color-text-secondary, #666); line-height: 1.4; }
+.badge { display: inline-block; font-size: 11px; padding: 2px 7px; border-radius: 8px; font-weight: 500; }
+.b-covered    { background: var(--color-background-success, #e6f4ea); color: var(--color-text-success, #1a7f37); }
+.b-partial    { background: var(--color-background-warning, #fff8e1); color: var(--color-text-warning, #b45309); }
+.b-open       { background: var(--color-background-danger,  #fde8e8); color: var(--color-text-danger,  #c0392b); }
+.b-dependency { background: var(--color-background-secondary, #f0f0f0); color: var(--color-text-secondary, #555); }
+.b-deferred   { background: var(--color-background-info, #e8f0fe); color: var(--color-text-info, #1a56cc); }
+.cr { display: inline-block; font-size: 11px; padding: 2px 6px; border-radius: 6px; font-weight: 500; white-space: nowrap; }
+.cr-yes      { background: var(--color-background-success, #e6f4ea); color: var(--color-text-success, #1a7f37); }
+.cr-no       { background: var(--color-background-danger,  #fde8e8); color: var(--color-text-danger,  #c0392b); }
+.cr-partial  { background: var(--color-background-warning, #fff8e1); color: var(--color-text-warning, #b45309); }
+.cr-deferred { background: var(--color-background-info, #e8f0fe); color: var(--color-text-info, #1a56cc); }
+.cr-na       { background: var(--color-background-secondary, #f0f0f0); color: var(--color-text-secondary, #555); }
+.jstatus { font-size: 11px; color: var(--color-text-secondary, #666); padding: 1px 0; }
+.note { font-size: 11px; color: var(--color-text-secondary, #666); line-height: 1.5; font-style: italic; }
+.note-flag { font-style: normal; color: var(--color-text-warning, #b45309); font-weight: 500; }
+.no-key { font-size: 11px; color: var(--color-text-danger, #c0392b); }
+.fix-version { font-size: 10px; color: var(--color-text-secondary, #888); font-family: var(--font-mono, monospace); }
+</style>
+<div class="wrap">
+  <div class="intro">
+    <strong>MVP Cohort 1 Readiness Mapping &mdash; PCC / Modern Treasury</strong><br>
+    Refreshed against live Jira (WIRE + BOOK) on 2026-04-29. Cohort definition follows the canonical MVP doc and Osaretin/Dave's mapping spreadsheet: <strong>Cohort 1 = first 5 clients (R01 Initial Cohort)</strong>, ramping to 30 in Cohort 2 (R02 Next Cohort). NPC migration is R04. Per the April 22 PMO sync, the team is intentionally minimizing Bookies UI scope for go-live because volume is small and MT handles most recon natively &mdash; that context is reflected in the cohort-readiness column for several rows.
+  </div>
+  <div class="filters">
+    <button class="filter-btn active" onclick="filter('all',this)">All needs</button>
+    <button class="filter-btn" onclick="filter('phase0',this)">Phase 0</button>
+    <button class="filter-btn" onclick="filter('phase1',this)">Phase I</button>
+    <button class="filter-btn" onclick="filter('extra',this)">Not in MVP doc</button>
+    <button class="filter-btn" onclick="filter('covered',this)">Covered</button>
+    <button class="filter-btn" onclick="filter('partial',this)">Partial</button>
+    <button class="filter-btn" onclick="filter('open',this)">Open gaps</button>
+    <button class="filter-btn" onclick="filter('deferred',this)">Deferred</button>
+    <button class="filter-btn" onclick="filter('dependency',this)">Dependency</button>
+    <button class="filter-btn" onclick="filter('notready',this)">Not Cohort-1 ready</button>
+  </div>
+  <div class="summary">
+    <div class="stat"><strong id="cnt-covered">&mdash;</strong>Covered</div>
+    <div class="stat"><strong id="cnt-partial">&mdash;</strong>Partial</div>
+    <div class="stat"><strong id="cnt-open">&mdash;</strong>Open gaps</div>
+    <div class="stat"><strong id="cnt-deferred">&mdash;</strong>Deferred</div>
+    <div class="stat"><strong id="cnt-dependency">&mdash;</strong>Dependency</div>
+    <div class="stat"><strong id="cnt-refs">&mdash;</strong><span>ticket refs</span><span id="distinct-note" style="font-size:10px;"></span></div>
+  </div>
+  <div class="legend">
+    <span class="leg"><span class="badge b-covered">Covered</span> Ticket exists and Delivered or in flight</span>
+    <span class="leg"><span class="badge b-partial">Partial</span> Work exists but doesn&rsquo;t close the need</span>
+    <span class="leg"><span class="badge b-open">Open</span> Gap &mdash; no ticket or too early to count</span>
+    <span class="leg"><span class="badge b-deferred">Deferred</span> Explicitly later cohort/release</span>
+    <span class="leg"><span class="badge b-dependency">Dependency</span> Another team owns this</span>
+  </div>
+  <table>
+    <thead><tr>
+      <th>#</th><th>MVP need</th><th>Jira ticket references</th><th>Jira status</th><th>Fix version</th><th>Cohort 1 ready?</th><th>Notes</th>
+    </tr></thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+<script>
+const jiraBase = "https://bamboohr.atlassian.net/browse/";
+
+const rows = [
+  { phase:"0", num:"P0.1", need:"Data flow through systems &mdash; intended architecture visual; Financial DB consideration", status:"open", cohortReady:"no",
+    tickets:[
+      { key:"WIRE-1005", summ:"New Backend Repos for Modern Treasury Implementation", jstatus:"Delivered", fix:"POP:R01" },
+      { key:"WIRE-1009", summ:"New Frontend Repos for Modern Treasury Implementation", jstatus:"Delivered", fix:"POP:R01" },
+      { key:"WIRE-1010", summ:"Create Modern Treasury API Client", jstatus:"Delivered", fix:"POP:R01" },
+      { key:"WIRE-1546", summ:"Refactor Bank Accounts Phase 1 (for PCC)", jstatus:"Delivered", fix:"POP:R01" }
+    ], note:"<span class='note-flag'>Architecture diagram and Financial DB decision still unkeyed.</span> Infrastructure and bank-account refactor delivered. Discovery answer 3/3/2026 left visual outstanding; Troy was to present the happy-path technical flow per Apr 29 agenda &mdash; verify it landed." },
+
+  { phase:"0", num:"P0.2", need:"Data source &mdash; where sourced, what transmitted to MoT; paycycle tables, new payment table", status:"covered", cohortReady:"yes",
+    tickets:[
+      { key:"WIRE-1146", summ:"Payroll Payment Scheduler/Workflow", jstatus:"Delivered", fix:"POP:R01" },
+      { key:"WIRE-1147", summ:"Payment Order Creation (Funding, DD, TFG) in Modern Treasury", jstatus:"Delivered", fix:"POP:R01" },
+      { key:"WIRE-1476", summ:"Funds Attestation in Payroll Approval", jstatus:"Delivered", fix:"&mdash;" }
+    ], note:"Paycycle sourcing answered in 3/3/2026 discovery. Funds Attestation delivered as an additional safeguard at approval." },
+
+  { phase:"0", num:"P0.3", need:"Segregate MoT client list and transactions &mdash; distinguish from NPC, PS controls client addition", status:"deferred", cohortReady:"deferred",
+    tickets:[
+      { key:"WIRE-1355", summ:"Modify Payment Center to exclude MT pay groups from NPC batches", jstatus:"Considering", fix:"&mdash; (no fix version)" },
+      { key:"WIRE-1547", summ:"Exclude MT Clients from Payment Center and Batches", jstatus:"Considering", fix:"POP:R02" },
+      { key:"BOOK-550", summ:"Exclude Cohort Client Transactions from Legacy Ledger & Recon Systems", jstatus:"Considering", fix:"POP:R02" }
+    ], note:"<span class='note-flag'>Both segregation tickets shifted from M06 to R02 since prior pass.</span> Per Apr 22 alignment, with only ~5 cohort-1 clients the team plans to handle segregation via operational controls; full system-level segregation lands in R02. <strong>Need explicit Trust Ops sign-off that this approach is acceptable for go-live.</strong>" },
+
+  { phase:"0", num:"P0.4", need:"Counterparties &mdash; how to use the concept; counterparties for DD and Legacy", status:"covered", cohortReady:"yes",
+    tickets:[], note:"Answered in discovery 3/3/2026: counterparties used for DD and Legacy. No standalone ticket required." },
+
+  { phase:"0", num:"P0.5", need:"Event / API call monitoring for failures", status:"open", cohortReady:"no",
+    tickets:[], note:"<span class='note-flag'>No Jira key.</span> UAT response (Shelley/Dave): API failures generate engineering error + Rollbar alert. <strong>This is engineering observability only &mdash; no business-side dashboard or paging path is keyed.</strong> Trust Ops needs a defined alert/escalation path before go-live." },
+
+  { phase:"0", num:"P0.6", need:"Ledger data at same detail level for collections and payments (CID / TaxTypeID level)", status:"covered", cohortReady:"yes",
+    tickets:[
+      { key:"BOOK-277", summ:"Ledger Collection of Payroll Funds and Distribution of Direct Deposits", jstatus:"Delivered", fix:"POP:R01" }
+    ], note:"Recorded at CID/TaxTypeID level (3/3/2026 discovery)." },
+
+  { phase:"0", num:"P0.7", need:"Permissions and personas in Payroll Command Center &mdash; ownership", status:"partial", cohortReady:"no",
+    tickets:[
+      { key:"BOOK-557", summ:"Set Up Roles and Permissions in PCC", jstatus:"Considering", fix:"POP:M05" },
+      { key:"WIRE-1548", summ:"Misc. PCC Views, Controls, and Edit Workflows", jstatus:"Considering", fix:"POP:M05" }
+    ], note:"<span class='note-flag'>Both still Considering, both in M05 (Access Controls + Deploy + DevEx) milestone.</span> Jen has nudged repeatedly that roles/permissions should be on every PM&rsquo;s radar from day 1. With 5 clients and a small ops team, manual access control is feasible &mdash; but this is a Shelley/Eric-flagged risk, not a clean defer." },
+
+  { phase:"0", num:"P0.8", need:"NSF handling after transfer to Legacy &mdash; reverse, update paycycle status, or hold via PTS", status:"partial", cohortReady:"no",
+    tickets:[
+      { key:"WIRE-1329", summ:"Workflow for ACH Debit (NSF) Returns", jstatus:"In Development", fix:"POP:R01" },
+      { key:"BOOK-343", summ:"Automate Ledgering of ACH Debit Returned Items (NSF)", jstatus:"Define", fix:"POP:R01" }
+    ], note:"WIRE-1329 in active dev, ledgering still in Define. Specifically post-legacy-transfer handling (reverse vs. paycycle status vs. PTS hold) is not separately keyed &mdash; needs Trust Ops + Mary alignment on the chosen path." },
+
+  { phase:"1", num:"1", need:"Profiles: establish client list, payee list and ledger &mdash; seeding MoT", status:"open", cohortReady:"no",
+    tickets:[], note:"<span class='note-flag'>No Jira key.</span> Prerequisite gap &mdash; nothing in the happy path works without seeded client/payee data. <strong>Doug is drafting initial cohort client list (Apr 22 + Apr 29 status); seeding mechanism for MT is operational and not yet defined.</strong>" },
+
+  { phase:"1", num:"2 & 5", need:"Insert payroll data on approval; sweep client, process DD, transfer to legacy", status:"covered", cohortReady:"yes",
+    tickets:[
+      { key:"BOOK-277", summ:"Ledger Collection of Payroll Funds and Distribution of Direct Deposits", jstatus:"Delivered", fix:"POP:R01" },
+      { key:"BOOK-341", summ:"Automate Ledgering of Fund Transfer to Legacy (Taxes, Fees, Deductions)", jstatus:"Delivered", fix:"POP:R01" }
+    ], note:"Happy-path backbone &mdash; strongest part of the portfolio. Both Initiatives Delivered." },
+
+  { phase:"1", num:"3", need:"Establish funding due date &mdash; client debit process date, EE DD process date", status:"covered", cohortReady:"yes",
+    tickets:[
+      { key:"WIRE-1146", summ:"Payroll Payment Scheduler/Workflow", jstatus:"Delivered", fix:"POP:R01" }
+    ], note:"Delivered. Recon timing depends on this; downstream item #15 (schedule control) is the open piece." },
+
+  { phase:"1", num:"4", need:"Access to new ledger data via reporting tool or SQL queries", status:"partial", cohortReady:"yes",
+    tickets:[
+      { key:"BOOK-276", summ:"New Ledger Tool in Payroll Command Center", jstatus:"Delivered", fix:"POP:R01" },
+      { key:"BOOK-340", summ:"Build Ledger Dashboard (Display Cash and Trust Balance)", jstatus:"Delivered", fix:"POP:R01" },
+      { key:"BOOK-386", summ:"Build Ledger Recon (Display Trust Balances)", jstatus:"Delivered", fix:"POP:R01" },
+      { key:"BOOK-561", summ:"Ledger Dashboard Iteration 3 &mdash; Bank Balance and Uncleared", jstatus:"Delivered", fix:"POP:R01" }
+    ], note:"UI visibility delivered. Per canonical mapping: <em>&ldquo;stakeholders should have access to databricks already&rdquo;</em> &mdash; SQL/reporting access is informally addressed. <strong>Verify databricks access is provisioned for the Trust Ops team specifically before go-live.</strong>" },
+
+  { phase:"1", num:"6", need:"Bank reconciliation / unreconciled items", status:"deferred", cohortReady:"deferred",
+    tickets:[
+      { key:"BOOK-372", summ:"Build Bank Reconciliation Workflow", jstatus:"Define", fix:"POP:R03" },
+      { key:"BOOK-386", summ:"Build Ledger Recon (Display Trust Balances)", jstatus:"Delivered", fix:"POP:R01" },
+      { key:"BOOK-398", summ:"Build Ledger Recon &mdash; Unpaid Liabilities + Difference Columns", jstatus:"Delivered", fix:"POP:R01" }
+    ], note:"<span class='note-flag'>BOOK-372 shifted from R01 to R03 since prior pass.</span> Per Apr 22 alignment: &ldquo;MT is 100% responsible for ACH transaction reconciliation. For non-ACH, rules in MT will help us. Very minimal records affected for go live.&rdquo; <strong>Confirms intentional defer to MT-native recon for cohort 1.</strong>" },
+
+  { phase:"1", num:"7", need:"Ability to book all types of transactions in new workflow DB", status:"partial", cohortReady:"no",
+    tickets:[
+      { key:"BOOK-374", summ:"Build Workflow for Manual Ledger Entry", jstatus:"Grooming", fix:"POP:R01" },
+      { key:"BOOK-381", summ:"Link Manual Ledger Entry Tool to Expected Payment Tool", jstatus:"Considering", fix:"POP:R01" }
+    ], note:"Manual entry escape-hatch progressed Design &rarr; <strong>Grooming</strong> since prior pass. Not yet delivered &mdash; without this, cohort 1 has no repair path for edge cases. Canonical mapping flagged: <em>&ldquo;we&rsquo;re booking to the ledger, not workflow DB&rdquo;</em>." },
+
+  { phase:"1", num:"8", need:"Item deletion mgmt &mdash; voids and reversal requests", status:"partial", cohortReady:"no",
+    tickets:[
+      { key:"WIRE-1357", summ:"Workflows for Voids", jstatus:"In Development", fix:"POP:R01" },
+      { key:"WIRE-1356", summ:"Workflows for Reversals", jstatus:"Define", fix:"POP:R01" },
+      { key:"BOOK-373", summ:"Automate Ledgering of Voids", jstatus:"Define", fix:"POP:R01" },
+      { key:"BOOK-375", summ:"Automate Ledgering of Reversals", jstatus:"Considering", fix:"POP:R01" }
+    ], note:"WIRE-1357 advanced Design &rarr; <strong>In Development</strong> since prior pass. WIRE-1356 still Define, BOOK-373 Define, BOOK-375 Considering. <strong>Voids/Reversals not closed for cohort 1 &mdash; manual intervention will be required.</strong>" },
+
+  { phase:"1", num:"9", need:"Returned item mgmt &mdash; NSF, NOC, EE account closed/doesn&rsquo;t exist, client funding ACH returns", status:"partial", cohortReady:"partial",
+    tickets:[
+      { key:"WIRE-1300", summ:"Workflow for NOCs", jstatus:"Prep for Release", fix:"POP:R01" },
+      { key:"WIRE-1301", summ:"Workflow for ACH Credit Returns", jstatus:"Prep for Release", fix:"POP:R01" },
+      { key:"WIRE-1329", summ:"Workflow for ACH Debit (NSF) Returns", jstatus:"In Development", fix:"POP:R01" },
+      { key:"BOOK-343", summ:"Automate Ledgering of ACH Debit Returned Items (NSF)", jstatus:"Define", fix:"POP:R01" },
+      { key:"BOOK-371", summ:"Automate Ledgering of ACH Credit Returned Items (DD)", jstatus:"Prep for Grooming", fix:"POP:R01" },
+      { key:"BOOK-650", summ:"Epic: Automate Ledgering of ACH Credit Returns", jstatus:"Considering", fix:"POP:R01" }
+    ], note:"WIRE workflows near release &mdash; this is the strongest exception path. <strong>BOOK ledgering for returns lags WIRE by ~2 statuses.</strong> If WIRE workflows ship without BOOK ledgering, ops will need to ledger returns manually until BOOK catches up." },
+
+  { phase:"1", num:"10", need:"Reverse wire mgmt &mdash; visibility, unfunded identification, customer communication", status:"deferred", cohortReady:"deferred",
+    tickets:[
+      { key:"BOOK-378", summ:"Automate Ledgering of Reverse Wires", jstatus:"Considering", fix:"POP:R02" },
+      { key:"WIRE-1302", summ:"Workflow for Reverse Wire", jstatus:"Define", fix:"POP:R02" }
+    ], note:"Both confirmed in <strong>POP:R02 Next Cohort</strong>. MVP doc asks for at least visibility; current state is no PCC visibility. <strong>Unfunded identification path will be manual / MT-native for cohort 1.</strong>" },
+
+  { phase:"1", num:"11", need:"Wire handling &mdash; distinguish customers in MoT, decouple wire & DD, no auto-matching", status:"open", cohortReady:"no",
+    tickets:[
+      { key:"BOOK-379", summ:"Automate Ledgering of Wires: Overfunds", jstatus:"Considering", fix:"POP:R01" },
+      { key:"BOOK-558", summ:"Automate Ledgering of Wires: Underfunds", jstatus:"Considering", fix:"POP:R01" },
+      { key:"WIRE-1358", summ:"Workflows for Wires - Part 1", jstatus:"Define", fix:"POP:R01" },
+      { key:"WIRE-1481", summ:"Workflow for Wires - Part 2", jstatus:"Define", fix:"POP:R02" }
+    ], note:"<span class='note-flag'>Wire handling is a notable risk for cohort 1.</span> WIRE-1358 in Define, BOOK-379 + BOOK-558 still Considering. Decouple Wire/DD was moved up to Phase 1 on 3/10/2026 &mdash; need to confirm WIRE-1358 actually closes this." },
+
+  { phase:"1", num:"12", need:"Onboarding solutions &mdash; bank compliance, updated debit auth, test debits, prenotes, KYC", status:"deferred", cohortReady:"deferred",
+    tickets:[
+      { key:"WIRE-1361", summ:"Test Debits and Prenotes", jstatus:"Considering", fix:"POP:R04" },
+      { key:"WIRE-1550", summ:"New Client Implementation onto New Platform", jstatus:"Considering", fix:"POP:R04" },
+      { key:"WIRE-1551", summ:"Customer Migration Tools onto New Platform and Banks", jstatus:"Considering", fix:"POP:R04" }
+    ], note:"Test Debits/Prenotes + migration tools all <strong>R04 NPC Cohort</strong>. KYC has no engineering ticket &mdash; Caleb-owned (3/10/26 check). <strong>Cohort 1 will rely on manual onboarding processes.</strong>" },
+
+  { phase:"1", num:"13a.i", need:"Reporting: customer funding ACH and reverse wire visibility (batches or individual)", status:"partial", cohortReady:"no",
+    tickets:[
+      { key:"BOOK-276", summ:"New Ledger Tool in Payroll Command Center", jstatus:"Delivered", fix:"POP:R01" },
+      { key:"WIRE-1145", summ:"Today's Payrolls in Payroll Command Center", jstatus:"Delivered", fix:"POP:R01" }
+    ], note:"Indirect coverage only &mdash; general ledger and Today&rsquo;s Payrolls views exist, but no ticket has ACH funding or reverse wire reporting as explicit acceptance criteria. <strong>Reverse wire visibility is a known gap (see #10) &mdash; deferred to R02.</strong>" },
+
+  { phase:"1", num:"13a.ii", need:"Reporting: employee direct deposit visibility (batches or by customer)", status:"partial", cohortReady:"no",
+    tickets:[
+      { key:"BOOK-276", summ:"New Ledger Tool in Payroll Command Center", jstatus:"Delivered", fix:"POP:R01" },
+      { key:"WIRE-1145", summ:"Today's Payrolls in Payroll Command Center", jstatus:"Delivered", fix:"POP:R01" }
+    ], note:"Indirect coverage. Per UAT feedback (10/31/2025): designs for detailed payroll view exist but not built; multi-EIN customer view has no solution yet." },
+
+  { phase:"1", num:"13a.iii", need:"Reporting: totals of tax payments, garnishments and fees collected; transfers between accounts", status:"deferred", cohortReady:"deferred",
+    tickets:[
+      { key:"BOOK-485", summ:"Create Aging AR Reports", jstatus:"Considering", fix:"POP:R03" },
+      { key:"BOOK-559", summ:"Create Aging AP Report", jstatus:"Considering", fix:"POP:R03" },
+      { key:"BOOK-560", summ:"Create Aging Uncleared Reports", jstatus:"Considering", fix:"POP:R03" }
+    ], note:"<span class='note-flag'>All three Aging reports shifted from M11 to R03 since prior pass.</span> Per canonical mapping: <em>&ldquo;Visibility via DB access for initial launch but will build reports in Phase 1a.&rdquo;</em> <strong>No tax/garn/fee totals ticket exists at all &mdash; that&rsquo;s an unresolved gap.</strong>" },
+
+  { phase:"1", num:"14", need:"User experience: entitlements &mdash; segregation of duties, limit high-risk items (NACHA files)", status:"partial", cohortReady:"no",
+    tickets:[
+      { key:"BOOK-557", summ:"Set Up Roles and Permissions in PCC", jstatus:"Considering", fix:"POP:M05" },
+      { key:"WIRE-1548", summ:"Misc. PCC Views, Controls, and Edit Workflows", jstatus:"Considering", fix:"POP:M05" }
+    ], note:"Same tickets as P0.7. <strong>NACHA file restriction is not explicitly captured in either ticket scope.</strong> Needs to be confirmed in BOOK-557 acceptance criteria before grooming." },
+
+  { phase:"1", num:"15", need:"Ability to control when transactions are scheduled and/or pushed through MoT", status:"open", cohortReady:"no",
+    tickets:[], note:"<span class='note-flag'>No Jira key.</span> WIRE-owned per scoping. Affects downstream recon timing. <strong>Surfaced 3/10/2026 &mdash; needs scoping conversation before cohort 1.</strong>" },
+
+  { phase:"X", num:"X1", need:"Backend security &mdash; token authentication on all backend endpoints", status:"open", cohortReady:"no",
+    tickets:[
+      { key:"WIRE-1540", summ:"Enable Token Authentication on All Backend Endpoints", jstatus:"Considering", fix:"POP:R01" }
+    ], note:"<span class='note-flag'>Not in MVP doc, but R01 Initial Cohort. Security item that should land before any production go-live.</span> Currently Considering. <strong>Push for go/no-go on this before cohort 1.</strong>" },
+
+  { phase:"X", num:"X2", need:"PCC views, controls, and edit workflows (misc.)", status:"open", cohortReady:"no",
+    tickets:[
+      { key:"WIRE-1548", summ:"Misc. PCC Views, Controls, and Edit Workflows", jstatus:"Considering", fix:"POP:M05" }
+    ], note:"Tied to roles/permissions track. Catch-all for PCC edit workflows that may include go-live items (hold/release/void from UAT feedback). <strong>Scope needs to be inventoried &mdash; what specifically is in this ticket?</strong>" },
+
+  { phase:"X", num:"X3", need:"Customer re-open / re-approve workflows", status:"deferred", cohortReady:"deferred",
+    tickets:[
+      { key:"WIRE-1388", summ:"Customer Re-open/Re-approve Workflows", jstatus:"Considering", fix:"POP:R02" }
+    ], note:"Shifted to R02 Next Cohort. Cohort 1 will not have programmatic re-open/re-approve &mdash; ops will handle manually." },
+
+  { phase:"X", num:"X4", need:"Cohort placeholders &mdash; fast follows and prep", status:"deferred", cohortReady:"deferred",
+    tickets:[
+      { key:"BOOK-738", summ:"[Placeholder] Initial cohort fast-follows -- Ledger / Recon", jstatus:"Considering", fix:"POP:R02" },
+      { key:"BOOK-737", summ:"Feature Enhancements for Next Cohort -- Ledger / Recon", jstatus:"Considering", fix:"POP:M07" },
+      { key:"BOOK-736", summ:"Prep System for Next Cohort -- Ledger / Recon", jstatus:"Considering", fix:"POP:M07" },
+      { key:"WIRE-1706", summ:"[Placeholder] Initial cohort fast-follows -- Payments", jstatus:"Considering", fix:"POP:R02" },
+      { key:"WIRE-1703", summ:"Prep System for Next Cohort -- Payments", jstatus:"Considering", fix:"POP:M07" },
+      { key:"WIRE-1705", summ:"Feature Enhancements for Next Cohort -- Payments", jstatus:"Considering", fix:"POP:M07" }
+    ], note:"Placeholder tickets for fast-follow work after cohort 1 ships. Their existence signals the team expects a non-trivial backlog of Cohort 1 fixes." }
+];
+
+const crLabel = { yes:"Yes", no:"No", partial:"Partial", deferred:"Deferred" };
+const crClass = { yes:"cr-yes", no:"cr-no", partial:"cr-partial", deferred:"cr-deferred" };
+
+function countRefs(data) {
+  let refs = 0;
+  const seen = new Set();
+  data.forEach(r => { r.tickets.forEach(t => { refs++; seen.add(t.key); }); });
+  return { refs, distinct: seen.size };
+}
+
+function render(data) {
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
+  const counts = { covered:0, partial:0, open:0, deferred:0, dependency:0 };
+  let lastPhase = null;
+
+  data.forEach(r => {
+    counts[r.status] = (counts[r.status]||0) + 1;
+
+    if(r.phase !== lastPhase) {
+      const ph = document.createElement('tr');
+      ph.className = 'phase-hdr';
+      let label = '';
+      if (r.phase === '0') label = 'Phase 0 — Before first client (discovery & foundation)';
+      else if (r.phase === '1') label = 'Phase I — MVP (Cohort 1: first 5 clients, ramp to 30)';
+      else label = 'Items NOT in MVP doc but cohort-1 relevant';
+      ph.innerHTML = `<td colspan="7">${label}</td>`;
+      tbody.appendChild(ph);
+      lastPhase = r.phase;
+    }
+
+    const tr = document.createElement('tr');
+    tr.className = 'row';
+    const ticketHTML = r.tickets.length
+      ? r.tickets.map(t=>`<div class="ticket"><a class="ticket-key" href="${jiraBase}${t.key}" target="_blank">${t.key}</a><div class="ticket-summ">${t.summ}</div></div>`).join('')
+      : `<span class="no-key">No ticket assigned</span>`;
+    const jstatusHTML = r.tickets.map(t=>`<div class="jstatus">${t.jstatus}</div>`).join('');
+    const fixHTML = r.tickets.map(t=>`<div class="fix-version">${t.fix||'—'}</div>`).join('');
+    const bMap = { covered:'b-covered Covered', partial:'b-partial Partial', open:'b-open Open', deferred:'b-deferred Deferred', dependency:'b-dependency Dependency' };
+    const [bc, bl] = bMap[r.status].split(' ');
+    const cr = r.cohortReady;
+
+    tr.innerHTML = `
+      <td><span class="num">${r.num}</span></td>
+      <td><div class="need-text">${r.need}</div><span class="badge ${bc}">${bl}</span></td>
+      <td><div class="tickets">${ticketHTML}</div></td>
+      <td>${jstatusHTML}</td>
+      <td>${fixHTML}</td>
+      <td><span class="cr ${crClass[cr]}">${crLabel[cr]}</span></td>
+      <td><span class="note">${r.note}</span></td>`;
+    tbody.appendChild(tr);
+  });
+
+  ['covered','partial','open','deferred','dependency'].forEach(k => {
+    const el = document.getElementById('cnt-'+k);
+    if(el) el.textContent = counts[k]||0;
+  });
+
+  const { refs, distinct } = countRefs(data);
+  document.getElementById('cnt-refs').textContent = refs;
+  document.getElementById('distinct-note').textContent = `(${distinct} distinct)`;
+}
+
+function filter(type, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const map = {
+    all: rows,
+    phase0: rows.filter(r=>r.phase==='0'),
+    phase1: rows.filter(r=>r.phase==='1'),
+    extra: rows.filter(r=>r.phase==='X'),
+    covered: rows.filter(r=>r.status==='covered'),
+    partial: rows.filter(r=>r.status==='partial'),
+    open: rows.filter(r=>r.status==='open'),
+    deferred: rows.filter(r=>r.status==='deferred'),
+    dependency: rows.filter(r=>r.status==='dependency'),
+    notready: rows.filter(r=>r.cohortReady==='no')
+  };
+  render(map[type]||rows);
+}
+
+render(rows);
+</script>
